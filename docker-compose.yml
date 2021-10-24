@@ -1,0 +1,29 @@
+version: '2.4'
+
+volumes:
+  nexus-data:
+    driver: local
+    driver_opts:
+      type: "ext4"
+      device: "/dev/vdb"
+
+services:
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - /etc/nginx:/etc/nginx:rw
+#     - /etc/plug:/usr/share/nginx:rw
+    ports:
+      - "443:443"
+      - "80:80"
+    restart: always
+
+  nexus:
+    image: sonatype/nexus3:3.34.1
+    volumes:
+      - nexus-data:/nexus-data
+    environment:
+      - "INSTALL4J_ADD_VM_PARAMS=-Xms16384M -Xmx16384M -XX:MaxDirectMemorySize=16384M"
+    restart: always
+    ports:
+      - "8081:8081"
